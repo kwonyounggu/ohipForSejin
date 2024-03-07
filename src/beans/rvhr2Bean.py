@@ -31,7 +31,7 @@ class RVHR2Bean:
     def getBillingAgentAddress(self):
         return self._billingAgentAddress
     
-    def getreservedForMOH(self):
+    def getReservedForMOH(self):
         return self._reservedForMOH
     
     def __str__(self):
@@ -41,7 +41,7 @@ class RVHR2Bean:
                        'Record Type: ' + self._recordType + '\n' + \
                        'Billing Agent: ' + self._billingAgent + '\n' + \
                        'Billing Agent Address: ' + self._billingAgentAddress + '\n' +  \
-                       'Reserved for MOH: ' + self._reservedForMOH
+                       'Reserved for MOH: ' + self._reservedForMOH + '\n'
         else:
             toString = 'Invalid because parsing is failed\n' + \
                        'Invalid Message: ' + self._invalidMessage

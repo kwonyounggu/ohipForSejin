@@ -76,7 +76,7 @@ class RVHR1Bean:
                        'Total Amount Payable: ' + str(self._totalAmountPayable) + '\n' + \
                        'Total Amount Payable Sign: ' + self._totalAmountPayableSign + '\n' + \
                        'Cheque Number: ' + self._chequeNumber + '\n' + \
-                       'Reserved for MOH2: ' + self._reservedForMOH2
+                       'Reserved for MOH2: ' + self._reservedForMOH2 + '\n'
                        
         else:
             toString = 'Invalid because parsing is failed\n' + \

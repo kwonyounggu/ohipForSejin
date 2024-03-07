@@ -22,7 +22,7 @@ class RVHR3Bean:
     def getTransactionIdentifier(self):
         return self._transactionIdentifier
     
-    def getrecordType(self):
+    def getRecordType(self):
         return self._recordType
     
     def getAddressLine2(self):
@@ -31,7 +31,7 @@ class RVHR3Bean:
     def getAddressLine3(self):
         return self._addressLine3
     
-    def getreservedForMOH(self):
+    def getReservedForMOH(self):
         return self._reservedForMOH
     
     def __str__(self):
@@ -41,7 +41,7 @@ class RVHR3Bean:
                        'Record Type: ' + self._recordType + '\n' + \
                        'Address Line2: ' + self._addressLine2 + '\n' + \
                        'Address Line3: ' + self._addressLine3 + '\n' +  \
-                       'Reserved for MOH: ' + self._reservedForMOH
+                       'Reserved for MOH: ' + self._reservedForMOH + '\n'
         else:
             toString = 'Invalid because parsing is failed\n' + \
                        'Invalid Message: ' + self._invalidMessage

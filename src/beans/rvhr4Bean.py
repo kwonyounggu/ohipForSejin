@@ -33,16 +33,49 @@ class RVHR4Bean:
     def getTransactionIdentifier(self):
         return self._transactionIdentifier
     
-    def getrecordType(self):
+    def getRecordType(self):
         return self._recordType
     
-    def getAddressLine2(self):
-        return self._addressLine2
+    def getClaimNumber(self):
+        return self._claimNumber
     
-    def getAddressLine3(self):
-        return self._addressLine3
+    def getTransactionType(self):
+        return self._transactionType
     
-    def getreservedForMOH(self):
+    def getHealthcareProvider(self):
+        return self._healthcareProvider
+    
+    def getSpeciality(self):
+        return self._speciality
+    
+    def getAccountingNumber(self):
+        return self._accountingNumber
+    
+    def getPatientLastName(self):
+        return self._patientLastName
+    
+    def getPatientFirstName(self):
+        return self._patientFirstName
+    
+    def getProvinceCode(self):
+        return self._provinceCode
+    
+    def getHealthRegistrationNumber(self):
+        return self._healthRegistrationNumber
+    
+    def getVersionCode(self):
+        return self._versionCode
+    
+    def getPaymentProgram(self):
+        return self._paymentProgram
+    
+    def getServiceLocator(self):
+        return self._serviceLocator
+    
+    def getMohGroupIdentifier(self):
+        return self._mohGroupIdentifier
+    
+    def getReservedForMOH(self):
         return self._reservedForMOH
     
     def __str__(self):
@@ -63,7 +96,7 @@ class RVHR4Bean:
                        'Payment Program: ' + self._paymentProgram + '\n' + \
                        'Service Locator: ' + self._serviceLocator + '\n' + \
                        'MOH Group Identifier: ' + self._mohGroupIdentifier + '\n' +  \
-                       'Reserved for MOH: ' + self._reservedForMOH
+                       'Reserved for MOH: ' + self._reservedForMOH + '\n'
         else:
             toString = 'Invalid because parsing is failed\n' + \
                        'Invalid Message: ' + self._invalidMessage
