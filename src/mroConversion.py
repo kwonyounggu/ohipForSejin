@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import sys
+import traceback
 
 from beans.fileInfoBean import FileInfoBean
 from beans.rvhr1Bean import RVHR1Bean
@@ -8,32 +9,50 @@ from beans.rvhr3Bean import RVHR3Bean
 from beans.rvhr4Bean import RVHR4Bean
 from beans.rvhr5Bean import RVHR5Bean
 
-def writeToCSV(fb, data):
+def writeToCSV(data):
     ##print('======>')
     ##print(data)
     hr1Bean = data['hr1Bean']
     hr2Bean = data['hr2Bean']
     hr3Bean = data['hr3Bean']
     
-    print('PAYEE NAME: ', hr1Bean.getPayeeName())
-    print('HEALTH CARE PROVIDER: ', hr1Bean.getHealthCareProvider())
-    print('GROUP NUMBER: ', hr1Bean.getGroupNumber())
-    print('PAYMENT DATE: ')
-    print('PAYMENT METHOD: ')
-    print('TOTAL AMOUNT: ')
-    print('RA SEQUENCE: ')
-    print('SPECIALITY: ')
-    print('BILLING AGENT: ')
+    try:
+        f = open(data['fb'].getPathFile() + '.csv', 'w', encoding='utf-8')
+        try:
+            f.write('PAYEE NAME:,' + hr1Bean.getPayeeName() + ',' + 'HEALTH CARE PROVIDER:,' + hr1Bean.getHealthCareProvider() + '\n')
+            
+            groupNumber = 'N/A' if hr1Bean.getGroupNumber() == '0000' else hr1Bean.getGroupNumber()
+            f.write('GROUP NUMBER:,' + groupNumber + ',' + 'PAYMENT DATE:,' + hr1Bean.getPaymentDate() + '\n')
+        
+            paymentMethod = ''
+            if hr1Bean.getChequeNumber() == '99999999': paymentMethod = 'Direct Deposit'
+            elif len(hr1Bean.getChequeNumber()) == 0: paymentMethod = 'Pay Patient'
+            else: paymentMethod = hr1Bean.getChequeNumber()
+            
+            f.write('PAYMENT METHOD:,' + paymentMethod + ',' + 'TOTAL AMOUNT:, ' + str(hr1Bean.getTotalAmountPayable()) + '\n')
+            f.write('RA SEQUENCE:,' + hr1Bean.getRemittanceAdviceSequence() + ',' + 'SPECIALITY:,' + hr1Bean.getSpeciality() + '\n')
+            f.write('BILLING AGENT:,' + hr2Bean.getBillingAgentAddress().strip() + ',' + \
+                                     hr3Bean.getAddressLine2().strip() + ',' + \
+                                     hr3Bean.getAddressLine3().strip() + '\n')
+        except Exception as e:
+            print(f"Error: something went wrong while writing! - {e}")
+            traceback.print_exc()
+        finally:
+            f.close()
+    except Exception as e:
+        print(f"Error: something went wrong while opening! - {e}")
+        traceback.print_exc()
 
 def remittanceReport(fb):
     
     dataDictionary = \
-    { \
-        'hr1Bean': None, \
-        'hr2Bean': None, \
-        'hr3Bean': None, \
-        'hr4BeanList': [], \
-        'hr5BeanList': [], \
+    { 
+        'fb': fb,
+        'hr1Bean': None, 
+        'hr2Bean': None, 
+        'hr3Bean': None, 
+        'hr4BeanList': [], 
+        'hr5BeanList': [], 
         'hr45BeanList': []
     }
     isValid = True
@@ -137,7 +156,7 @@ def main():
                 case 'P': 
                     print('Report')
                     data = remittanceReport(fb) 
-                    if data is not None: writeToCSV(fb, data)  
+                    if data is not None: writeToCSV(data)  
                     else: print('None is returned ...')    
                 case '_': print('Unknown report type ...')
             print(fb)
