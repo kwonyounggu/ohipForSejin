@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import sys
 import traceback
+import datetime
 
 from beans.fileInfoBean import FileInfoBean
 from beans.rvhr1Bean import RVHR1Bean
@@ -9,6 +10,9 @@ from beans.rvhr3Bean import RVHR3Bean
 from beans.rvhr4Bean import RVHR4Bean
 from beans.rvhr5Bean import RVHR5Bean
 
+def sortByDate(o):
+    date_split = o['serviceDate'].split('/')   
+    return date_split[0], date_split[1], date_split[2]
 def writeToCSV(data):
     ##print('======>')
     ##print(data)
@@ -34,6 +38,28 @@ def writeToCSV(data):
             f.write('BILLING AGENT:,' + hr2Bean.getBillingAgentAddress().strip() + ',' + \
                                      hr3Bean.getAddressLine2().strip() + ',' + \
                                      hr3Bean.getAddressLine3().strip() + '\n')
+            f.write('NO, ACCOUNTING NUMBER, CLAIM NUMBER, REG NUMBER, HC PROVIDER, PAYMENT RPOGRAM, PROVINCE, SPECIALITY, TX TYPE, VSN CODE, EXP CODE, SVC DATE, NO.OF SVC, SVC CODE, AMT SUBMITTED($), AMT PAID($)\n')
+            ## sort by date in ascending order
+            hr45BeanListSorted = sorted(data['hr45BeanList'], key=sortByDate)
+            #for index, hr45Bean in enumerate(data['hr45BeanList']):
+            for index, hr45Bean in enumerate(hr45BeanListSorted):
+                f.write(str(index) + ',' + \
+                        hr45Bean['accountingNumber'] + ',' + \
+                        hr45Bean['claimNumber'] + ',' + \
+                        hr45Bean['healthRegistrationNumber'] + ',' + \
+                        hr45Bean['healthcareProvider'] + ',' + \
+                        hr45Bean['paymentProgram'] + ',' + \
+                        hr45Bean['provinceCode'] + ',' + \
+                        hr45Bean['speciality'] + ',' + \
+                        hr45Bean['transactionType'] + ',' + \
+                        hr45Bean['versionCode'] + ',' + \
+                        hr45Bean['explanatoryCode'] + ',' + \
+                        hr45Bean['serviceDate'] + ',' + \
+                        hr45Bean['numberOfServices'] + ',' + \
+                        hr45Bean['serviceCode'] + ',' + \
+                        str(hr45Bean['amountSubmitted']) + ',' + \
+                        str(hr45Bean['amountPaid']) + '\n')
+        
         except Exception as e:
             print(f"Error: something went wrong while writing! - {e}")
             traceback.print_exc()
@@ -113,7 +139,7 @@ def remittanceReport(fb):
                     hr45Bean['versionCode'] = hr4Bean.getVersionCode()
                     hr45Bean['paymentProgram'] = hr4Bean.getPaymentProgram()
                     
-                    hr45Bean['serviceDate'] = hr5Bean.getServiceCode()
+                    hr45Bean['serviceDate'] = hr5Bean.getServiceDate()
                     hr45Bean['numberOfServices'] = hr5Bean.getNumberOfServices()
                     hr45Bean['serviceCode'] = hr5Bean.getServiceCode()
                     hr45Bean['amountSubmitted'] = hr5Bean.getAmountSubmitted()
@@ -154,14 +180,16 @@ def main():
                 case 'E': print('Claim Error')
                 case 'F': print('Claim Error')
                 case 'P': 
-                    print('Report')
+                    print('Remittance Report for file: ', fb.getFileName() + '.csv')
                     data = remittanceReport(fb) 
                     if data is not None: writeToCSV(data)  
                     else: print('None is returned ...')    
                 case '_': print('Unknown report type ...')
-            print(fb)
-            print('----------------------------------')   
-        else: print(fb)
+            #print(fb)
+            #print('----------------------------------')   
+        else: 
+            #print(fb)
+            pass
 
 if __name__ == '__main__':
     main()
