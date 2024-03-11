@@ -189,8 +189,8 @@ def main():
             #print(fb)
             #print('----------------------------------')   
         else: 
-            #print(fb)
-            pass
+            print('Invalid for file: ', fb.getFileName())
+            #pass
 
 if __name__ == '__main__':
     main()
