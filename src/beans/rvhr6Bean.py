@@ -1,5 +1,5 @@
 # do accordingly tomorrow
-class RVHR5Bean:
+class RVHR6Bean:
     _isValid = True
     #_invalidMessage = ''
     def __init__(self, line):

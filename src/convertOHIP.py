@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 import sys
 import traceback
-import datetime
+import locale
+#import datetime
 
 from beans.fileInfoBean import FileInfoBean
 from beans.rvhr1Bean import RVHR1Bean
@@ -9,6 +10,9 @@ from beans.rvhr2Bean import RVHR2Bean
 from beans.rvhr3Bean import RVHR3Bean
 from beans.rvhr4Bean import RVHR4Bean
 from beans.rvhr5Bean import RVHR5Bean
+from beans.rvhr6Bean import RVHR6Bean
+from beans.rvhr7Bean import RVHR7Bean
+from beans.rvhr8Bean import RVHR8Bean
 
 def sortByDate(o):
     date_split = o['serviceDate'].split('/')   
@@ -19,6 +23,10 @@ def writeToCSV(data):
     hr1Bean = data['hr1Bean']
     hr2Bean = data['hr2Bean']
     hr3Bean = data['hr3Bean']
+    hr6Bean = data['hr6Bean']
+    hr7Bean = data['hr7Bean']
+    
+    locale.setlocale(locale.LC_ALL, 'en_CA.UTF-8')
     
     try:
         f = open(data['fb'].getPathFile() + '.csv', 'w', encoding='utf-8')
@@ -59,7 +67,35 @@ def writeToCSV(data):
                         hr45Bean['serviceCode'] + ',' + \
                         str(hr45Bean['amountSubmitted']) + ',' + \
                         str(hr45Bean['amountPaid']) + '\n')
-        
+            #HR6 record
+            if hr6Bean is not None:
+                print('HR6... for ' + data['fb'].getPathFile())
+                f.write('\n\n')
+                f.write('Balance Forward Record\n')
+                f.write('Amount Brought Forward – Claims Adjustment ($): ' + str(hr6Bean.getAmtBrtFwdClaimsAdjustment()) + '\n')
+                f.write('Amount Brought Forward – Advances ($): ' + str(hr6Bean.getAmtBrtFwdClaimsAdvances()) + '\n');
+                f.write('Amount Brought Forward – Reductions ($): ' + str(hr6Bean.getAmtBrtFwdReductions()) + '\n');
+                f.write('Amount Brought Forward – Other Deductions ($): ' + str(hr6Bean.getAmtBrtFwdOtherDeductions()) + '\n');
+
+            #HR7 record
+            if hr7Bean is not None:
+                print('HR7... for ' + data['fb'].getPathFile())
+                f.write('\n\n')
+                f.write('Accounting Transaction Record\n')
+                f.write('Transaction Code: ' + hr7Bean.getTransactionCode()+ '\n')
+                f.write('Transaction Date: ' + hr7Bean.getTransactionDate()+ '\n');
+                f.write('Transaction Amount ($): ' + str(hr7Bean.getTransactionAmount()) + '\n');
+                f.write('Transaction Message: ' + hr7Bean.getTransactionMessage().replace(',', '') + '\n');
+                
+            #HR8 records
+            hr8BeanList = data['hr8BeanList']
+            if len(hr8BeanList) > 0:
+                f.write('\n\n')
+                f.write('Message Facility Record\n')
+                for hr8Bean in hr8BeanList:
+                    if hr8Bean.getMessageText().startswith('*'): f.write('\n')
+                    else: f.write(hr8Bean.getMessageText().replace(',', '')  + '\n')
+            
         except Exception as e:
             print(f"Error: something went wrong while writing! - {e}")
             traceback.print_exc()
@@ -79,7 +115,10 @@ def remittanceReport(fb):
         'hr3Bean': None, 
         'hr4BeanList': [], 
         'hr5BeanList': [], 
-        'hr45BeanList': []
+        'hr45BeanList': [],
+        'hr6Bean': None,
+        'hr7Bean': None,
+        'hr8BeanList': []
     }
     isValid = True
     
@@ -157,6 +196,31 @@ def remittanceReport(fb):
                 isValid = False
                 break 
             # print(index, '=>', hr5Bean)
+        elif line.startswith('HR6'):
+            hr6Bean = RVHR6Bean(line)
+            if hr6Bean.getIsValid():
+                dataDictionary['hr6Bean'] = hr6Bean
+            else:
+                print(hr6Bean,'\n', fb.getPathFile())
+                isValid = False
+                break    
+        elif line.startswith('HR7'):
+            hr7Bean = RVHR7Bean(line)
+            if hr7Bean.getIsValid():
+                dataDictionary['hr7Bean'] = hr7Bean
+            else:
+                print(hr7Bean,'\n', fb.getPathFile())
+                isValid = False
+                break 
+        elif line.startswith('HR8'):
+            hr8Bean = RVHR8Bean(line)
+            if hr8Bean.getIsValid():
+                dataDictionary['hr8BeanList'].append(hr8Bean)
+            else:
+                print(hr8Bean,'\n', fb.getPathFile())
+                isValid = False
+                break    
+               
     f.close()
     
     if isValid: return dataDictionary
